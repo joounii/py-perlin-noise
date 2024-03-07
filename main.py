@@ -1,4 +1,5 @@
 from render_gui import render
+import random
 
 height = 100
 width = 100
@@ -12,7 +13,7 @@ x = 0
 while i < height:
     width_array = []
     while x < width:
-        width_array.extend([1])
+        width_array.extend([random.randint(0,3)])
         x += 1
     perlin_array.extend([width_array])
 
