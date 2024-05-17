@@ -5,7 +5,6 @@ from numpy import *
 def get_color(value, max_value):
     color = hex(int(255 / max_value * value)).replace('0x', '') * 3
     print(color)
-    print(type(color))
     return color
 
 def render(data_array, max_value):
