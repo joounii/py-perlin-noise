@@ -1,9 +1,16 @@
 import tkinter as tk
 from tkinter import ttk
 from numpy import *
+from colored_print import log
 
 def get_color(value, max_value):
-    color = hex(int(255 / max_value * value)).replace('0x', '') * 3
+    color = hex(int(255 / max_value * value)).replace('0x', '')
+     # use the hex color value to creat a hex color code
+    if(len(color) != 2):
+        color = ("0" + color) * 3
+        log.warn("fixed color code: " + color)
+    else:
+        color = color * 3
     print(color)
     return color
 
@@ -15,7 +22,7 @@ def render(data_array, max_value):
     canvas = tk.Canvas(root)
     height = 0
     width = 0
-    pixel_size = 3
+    pixel_size = 1
     
     for i in data_array:
         for x in i:
