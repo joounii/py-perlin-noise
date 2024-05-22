@@ -57,13 +57,13 @@ def print_noise(noise):
 def create_array_for_rendering():
     flattened_list_noise_list = [element for row in noise for element in row]
     min_value = min(flattened_list_noise_list)
-    log.success(min_value)
+    # log.success(min_value)
     positiv_noise_list = [[(element + (min_value * -1)) * 100 for element in row] for row in noise]
     flattened_list_positiv_list = [element for row in positiv_noise_list for element in row]
     max_value = max(flattened_list_positiv_list)
     min_value = min(flattened_list_positiv_list)
-    log.success(max_value)
-    log.success(min_value)
+    # log.success(max_value)
+    # log.success(min_value)
     
     # print("------------------")
     # print_noise(positiv_noise_list)
@@ -71,10 +71,12 @@ def create_array_for_rendering():
 
 
 if __name__ == "__main__":
-    width = 1000
-    height = 1000
-    scale = 10
+    log.warn("started calculating array...")
+    width = 1000 #249
+    height = 1000 #123
+    scale = 30
     noise = generate_perlin_noise(width, height, scale)
     # noise_array = array("i", noise)
-    print_noise(noise)
+    # print_noise(noise)
+    log.success("successfuly calculated array")
     create_array_for_rendering()

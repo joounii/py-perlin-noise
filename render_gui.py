@@ -8,13 +8,15 @@ def get_color(value, max_value):
      # use the hex color value to creat a hex color code
     if(len(color) != 2):
         color = ("0" + color) * 3
-        log.warn("fixed color code: " + color)
+        # log.warn("fixed color code: " + color)
     else:
         color = color * 3
-    print(color)
+    # print(color)
     return color
 
 def render(data_array, max_value):
+    
+    log.warn("stared rendering...")
     root = tk.Tk()
     # root.geometry("240x100")
     root.title('Perlin Noise')
@@ -35,6 +37,8 @@ def render(data_array, max_value):
     # canvas.create_rectangle(10, 30, 30, 50, outline = "black", fill = "blue", width = 2)
 
     canvas.pack(fill = "both", expand = True)
+
+    log.success("rendering done!")
 
     root.mainloop()
 
