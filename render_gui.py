@@ -22,7 +22,7 @@ def render(data_array, max_value):
     canvas = tk.Canvas(root)
     height = 0
     width = 0
-    pixel_size = 1
+    pixel_size = 5
     
     for i in data_array:
         for x in i:

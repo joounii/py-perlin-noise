@@ -1,61 +1,80 @@
-from render_gui import render
+import math
 import random
+from array import array
+from colored_print import log
+from render_gui import render
 
-height = 100
-width = 100
+def fade(t):
+    return t * t * t * (t * (t * 6 - 15) + 10)
 
-color_scale = 100
+def lerp(t, a, b):
+    return a + t * (b - a)
 
-start_points = 5
+def grad(hash, x, y):
+    h = hash & 7
+    u = x if h < 4 else y
+    v = y if h < 4 else x
+    return (u if h & 1 == 0 else -u) + (v if h & 2 == 0 else -v)
 
-perlin_array = []
+def perlin(x, y, perm):
+    X = int(x) & 255
+    Y = int(y) & 255
+    
+    x -= int(x)
+    y -= int(y)
+    
+    u = fade(x)
+    v = fade(y)
+    
+    aa = perm[perm[X] + Y]
+    ab = perm[perm[X] + Y + 1]
+    ba = perm[perm[X + 1] + Y]
+    bb = perm[perm[X + 1] + Y + 1]
+    
+    return lerp(v, lerp(u, grad(aa, x, y), grad(ba, x - 1, y)),
+                   lerp(u, grad(ab, x, y - 1), grad(bb, x - 1, y - 1)))
 
-last_color = random.randint(0,color_scale)
+def generate_perlin_noise(width, height, scale=100):
+    random.seed(0)
+    perm = list(range(256))
+    random.shuffle(perm)
+    perm += perm  # duplicate the permutation list
+    
+    noise = [[0] * width for _ in range(height)]
+    
+    for y in range(height):
+        for x in range(width):
+            nx = x / scale
+            ny = y / scale
+            noise[y][x] = perlin(nx, ny, perm)
+    
+    return noise
 
-color_change = 10
-
-first_row = True
-first_pixel_in_row = True
-
-i = 0
-x = 0
-
-# current logic: 
-# step 1: generate a random number between 0 and the color_scale
-# step 2: with that random number generate a random number that is +/- 10 from the generated number befor
-# step 3: repeat this step until the max witdth is reacht but always use the random number generated befor to calculate the new value with +/- 10
-# step 4: after the first row of pixel is generated get the pixel abofe and calculated the averag between the left and the above pixel to get the base pixel
-# step 5: use the new base pixel to generate the current pixel with +/- 10 and repeat from step 4 until all pixels are generated
-
-while i < height:
-    width_array = []
-    while x < width:
-        if(first_row):
-            if(last_color - color_change >= 0 and last_color + color_change <= color_scale):
-                new_color = random.randint(last_color - color_change, last_color + color_change)
-            elif(last_color - color_change <= 0):
-                new_color = random.randint(last_color, last_color + color_change)
-            elif(last_color + color_change >= color_scale):
-                new_color = random.randint(last_color - color_change, last_color)
-        else:
-            if(first_pixel_in_row):
-                last_color = perlin_array[i -1][x]
-            else:
-                last_color = (perlin_array[i -1][x] + last_color) / 2
-            if(last_color - color_change >= 0 and last_color + color_change <= color_scale):
-                new_color = random.randint(last_color - color_change, last_color + color_change)
-            elif(last_color - color_change <= 0):
-                new_color = random.randint(last_color, last_color + color_change)
-            elif(last_color + color_change >= color_scale):
-                new_color = random.randint(last_color - color_change, last_color)
+def print_noise(noise):
+    for row in noise:
+        print("".join(f"{val:.2f} " for val in row))
         
-        width_array.extend([new_color])
-        last_color = new_color
-        x += 1
-    perlin_array.extend([width_array])
-    first_row = False
-    i += 1
-    x = 0
+def create_array_for_rendering():
+    flattened_list_noise_list = [element for row in noise for element in row]
+    min_value = min(flattened_list_noise_list)
+    log.success(min_value)
+    positiv_noise_list = [[(element + (min_value * -1)) * 100 for element in row] for row in noise]
+    flattened_list_positiv_list = [element for row in positiv_noise_list for element in row]
+    max_value = max(flattened_list_positiv_list)
+    min_value = min(flattened_list_positiv_list)
+    log.success(max_value)
+    log.success(min_value)
+    
+    # print("------------------")
+    # print_noise(positiv_noise_list)
+    render(positiv_noise_list, max_value)
 
-render(perlin_array, color_scale)
-print(perlin_array)
+
+if __name__ == "__main__":
+    width = 1000
+    height = 1000
+    scale = 10
+    noise = generate_perlin_noise(width, height, scale)
+    # noise_array = array("i", noise)
+    print_noise(noise)
+    create_array_for_rendering()
